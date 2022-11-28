@@ -32,6 +32,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dependencytrack.auth.Permissions;
 import org.dependencytrack.event.IndexEvent;
+import org.dependencytrack.event.ProjectCreationEvent;
 import org.dependencytrack.model.Analysis;
 import org.dependencytrack.model.AnalysisComment;
 import org.dependencytrack.model.Classifier;
@@ -430,6 +431,7 @@ final class ProjectQueryManager extends QueryManager implements IQueryManager {
         bind(project, resolvedTags);
 
         Event.dispatch(new IndexEvent(IndexEvent.Action.CREATE, pm.detachCopy(result)));
+        Event.dispatch(new ProjectCreationEvent(pm.detachCopy(result)));
         commitSearchIndex(commitIndex, Project.class);
         return result;
     }

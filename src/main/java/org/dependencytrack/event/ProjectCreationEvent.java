@@ -22,27 +22,23 @@ import alpine.event.framework.AbstractChainableEvent;
 
 import java.util.UUID;
 
+import org.dependencytrack.model.Project;
+
 /**
  * Defines an event triggered when a new project is created.
  *
  * @author Mark Zeman
- * @since 4.6.x
+ * @since 4.7.0
  */
 public class ProjectCreationEvent extends AbstractChainableEvent {
 
-  private final UUID projectUuid;
-  private final String projectName;
+  private final Project project;
   
-  public ProjectCreationEvent(final UUID projectUuid, final String projectName){
-    this.projectUuid = projectUuid;
-    this.projectName = projectName;
+  public ProjectCreationEvent(final Project project){
+    this.project = project;
   }
 
-  public UUID getProjectUuid() {
-    return projectUuid;
-  }
-
-  public String getProjectName(){
-    return projectName;
+  public Project getProject(){
+    return this.project;
   }
 }
