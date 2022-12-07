@@ -24,6 +24,8 @@ import alpine.model.ApiKey;
 import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
+import alpine.notification.Notification;
+import alpine.notification.NotificationLevel;
 import alpine.persistence.PaginatedResult;
 import alpine.resources.AlpineRequest;
 import com.github.packageurl.PackageURL;
@@ -32,7 +34,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dependencytrack.auth.Permissions;
 import org.dependencytrack.event.IndexEvent;
-import org.dependencytrack.event.ProjectCreationEvent;
 import org.dependencytrack.model.Analysis;
 import org.dependencytrack.model.AnalysisComment;
 import org.dependencytrack.model.Classifier;
@@ -44,6 +45,10 @@ import org.dependencytrack.model.ProjectProperty;
 import org.dependencytrack.model.ServiceComponent;
 import org.dependencytrack.model.Tag;
 import org.dependencytrack.model.Vulnerability;
+import org.dependencytrack.notification.NotificationConstants;
+import org.dependencytrack.notification.NotificationGroup;
+import org.dependencytrack.notification.NotificationScope;
+import org.dependencytrack.util.NotificationUtil;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
@@ -431,7 +436,13 @@ final class ProjectQueryManager extends QueryManager implements IQueryManager {
         bind(project, resolvedTags);
 
         Event.dispatch(new IndexEvent(IndexEvent.Action.CREATE, pm.detachCopy(result)));
-        Event.dispatch(new ProjectCreationEvent(pm.detachCopy(result)));
+        Notification.dispatch(new Notification()
+        .scope(NotificationScope.PORTFOLIO)
+        .group(NotificationGroup.PROJECT_CREATED)
+        .title(NotificationConstants.Title.PROJECT_CREATED)
+        .level(NotificationLevel.INFORMATIONAL)
+        .content(result.getName() + " was created")
+        .subject(NotificationUtil.toJson(pm.detachCopy(result))));
         commitSearchIndex(commitIndex, Project.class);
         return result;
     }
